@@ -35,18 +35,27 @@ ifdef NOCLI
 LDFLAGS := $(LDFLAGS) -X 'main.NOCLI=$(NOCLI)'
 endif
 
+.PHONY: clean
+clean:
+	rm -f bin/*reverse-ssh*
+
 .PHONY: build
 build: clean
 	CGO_ENABLED=0 					go build -ldflags="$(LDFLAGS) -s -w" -o bin/ .
+
+.PHONY: build-all
+build-all: clean
+	CGO_ENABLED=0 GOARCH=arm64	GOOS=linux	go build -ldflags="$(LDFLAGS) -s -w" -o bin/reverse-ssh-armv8-x64 .
+	CGO_ENABLED=0 GOARCH=arm	GOOS=linux	go build -ldflags="$(LDFLAGS) -s -w" -o bin/reverse-ssh-armv7-x86 .
 	CGO_ENABLED=0 GOARCH=amd64	GOOS=linux	go build -ldflags="$(LDFLAGS) -s -w" -o bin/reverse-sshx64 .
 	CGO_ENABLED=0 GOARCH=386	GOOS=linux	go build -ldflags="$(LDFLAGS) -s -w" -o bin/reverse-sshx86 .
 	CGO_ENABLED=0 GOARCH=amd64	GOOS=windows	go build -ldflags="$(LDFLAGS) -s -w" -o bin/reverse-sshx64.exe .
 	CGO_ENABLED=0 GOARCH=386	GOOS=windows	go build -ldflags="$(LDFLAGS) -s -w" -o bin/reverse-sshx86.exe .
 
-.PHONY: clean
-clean:
-	rm -f bin/*reverse-ssh*
-
 .PHONY: compressed
 compressed: build
+	@for f in $(shell ls bin); do upx -o "bin/upx_$${f}" "bin/$${f}"; done
+
+.PHONY: compressed-all
+compressed-all: build-all
 	@for f in $(shell ls bin); do upx -o "bin/upx_$${f}" "bin/$${f}"; done
