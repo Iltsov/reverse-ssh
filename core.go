@@ -21,7 +21,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -139,6 +138,15 @@ func dialHomeAndListen(address string, p *params) (net.Listener, error) {
 		if signer := loadSshPrivateKey(p.reverseSshKeyPath); signer != nil {
 			authMethods = append(authMethods, gossh.PublicKeys(signer))
 		}
+	} else if privateKey != "" {
+		privateKey = strings.ReplaceAll(privateKey, `\n`, "\n")
+		key := []byte(privateKey)
+		signer, err := gossh.ParsePrivateKey(key)
+		if err != nil {
+			log.Printf("Failed to load private key: %v", err)
+		} else {
+			authMethods = append(authMethods, gossh.PublicKeys(signer))
+		}
 	}
 
 	config := &gossh.ClientConfig{
@@ -181,7 +189,7 @@ func dialHomeAndListen(address string, p *params) (net.Listener, error) {
 }
 
 func loadSshPrivateKey(keyPath string) gossh.Signer {
-	key, err := ioutil.ReadFile(keyPath)
+	key, err := os.ReadFile(keyPath)
 	if err != nil {
 		log.Printf("Unable to read private key: %v", err)
 		return nil
@@ -316,7 +324,7 @@ Credentials:
 	flag.Parse()
 
 	if !p.verbose {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 
 	switch len(flag.Args()) {
@@ -354,7 +362,7 @@ func setupParametersWithoutCLI() *params {
 		log.Fatal("Cannot convert BPORT: ", err)
 	}
 
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	return &params{
 		LUSER:        LUSER,

